@@ -7,15 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "..";
 
 export const Login = () => {
-  const {
-    email,
-    password,
-    loading,
-    error,
-    handleLogin,
-    setEmail,
-    setPassword,
-  } = useLogin();
+  const { email, password, loading, handleLogin, setEmail, setPassword } =
+    useLogin();
 
   return (
     <Card className="w-full max-w-sm">
@@ -43,8 +36,6 @@ export const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-
-        {error && <p className="text-sm text-red-500">{error}</p>}
 
         <Button className="w-full" onClick={handleLogin} disabled={loading}>
           {loading ? "Ingresando..." : "Ingresar"}

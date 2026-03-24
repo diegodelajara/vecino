@@ -2,17 +2,14 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/supabaseClient";
-import { useRouter } from "next/navigation";
 
 export const useLogin = () => {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
+    setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -26,10 +23,10 @@ export const useLogin = () => {
 
       window.location.href = "/dashboard";
     }
+    setLoading(false);
   };
 
   return {
-    error,
     email,
     handleLogin,
     loading,

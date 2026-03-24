@@ -16,14 +16,14 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  const { data: expenses } = await supabase
-    .from("unit_expenses")
-    .select("*")
-    .eq("unit_id", profile.unit_id);
+  //   const { data: expenses } = await supabase
+  //     .from("unit_expenses")
+  //     .select("*")
+  //     .eq("unit_id", profile.unit_id);
 
   const { data } = await supabase.from("profiles").select("*");
 
-  console.log("expenses", expenses);
+  //   console.log("expenses", expenses);
   console.log("profile", data);
 
   return (
