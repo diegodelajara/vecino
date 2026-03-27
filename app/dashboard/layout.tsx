@@ -8,8 +8,8 @@ import {
   DashboardProfileCard,
   DashboardSummaryCard,
   DashboardUnitCard,
+  DashboardHeader,
 } from "../(features)/containers";
-import { DashboardHeader } from "./DashboardHeader";
 
 export default async function DashboardLayout({
   children,

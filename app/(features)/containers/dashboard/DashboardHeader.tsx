@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { logout } from "./actions";
+import { logout } from "../../../dashboard/actions";
 
 type Props = {
   name?: string | null;
