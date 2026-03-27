@@ -3,7 +3,13 @@ import {
   serverAuthService,
   serverProfilesService,
 } from "@/lib/supabase/services";
-import { UnitWithCondominium, UnitExpenseWithExpense } from "@/app/types";
+import {
+  DashboardExpensesTable,
+  DashboardProfileCard,
+  DashboardSummaryCard,
+  DashboardUnitCard,
+} from "../(features)/containers";
+import { DashboardHeader } from "./DashboardHeader";
 
 export default async function DashboardLayout({
   children,
@@ -30,45 +36,27 @@ export default async function DashboardLayout({
     profileData?.unit_id,
   );
 
-  console.log(expensesData);
-
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-64 border-r p-4">
-        <h2 className="font-bold">CondoApp</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      <DashboardHeader name={profileData?.name} email={user?.email} />
 
-        <p className="text-sm mt-2">{profileData?.name || "Usuario"}</p>
-        <p className="text-xs text-gray-500">{user?.email}</p>
-        <p className="text-xs text-gray-500">{profileData?.role}</p>
-      </aside>
-
-      <main className="flex-1 p-6">{children}</main>
-
-      <p>{profileData?.name}</p>
-      <p>{user.email}</p>
-
-      {unitData && (
-        <>
-          <p>Depto: {unitData.number}</p>
-          <p>Torre: {unitData.tower}</p>
-          <p>Condominio: {unitData.condominiums?.name}</p>
-        </>
-      )}
-      {expensesData && expensesData.length > 0 ? (
-        <div>
-          <h3>Gastos del mes:</h3>
-          <ul>
-            {expensesData.map((expense) => (
-              <li key={expense.id}>
-                {expense.expenses?.month}/{expense.expenses?.year}: $
-                {expense.amount} - {expense.status}
-              </li>
-            ))}
-          </ul>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <DashboardProfileCard
+            name={profileData?.name}
+            role={profileData?.role}
+            email={user?.email}
+          />
+          <DashboardUnitCard unit={unitData ?? null} />
+          <DashboardSummaryCard expenses={expensesData ?? null} />
         </div>
-      ) : (
-        <p>No hay gastos registrados.</p>
-      )}
+
+        <DashboardExpensesTable expenses={expensesData ?? null} />
+
+        {/* Page Content */}
+        <div className="mt-8">{children}</div>
+      </main>
     </div>
   );
 }

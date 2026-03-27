@@ -58,8 +58,7 @@ export const serverProfilesService = {
     const supabase = await createClient();
     return supabase
       .from("unit_expenses")
-      .select(`amount,status,expenses (month, year)`)
-      .eq("unit_id", id)
-      .single();
+      .select(`*, expenses (month, year)`)
+      .eq("unit_id", id);
   },
 };
