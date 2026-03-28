@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/lib/supabase/hooks";
+import { redirect } from "next/navigation";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export const useLogin = () => {
     const result = await signIn(email, password);
 
     if (result.success) {
-      window.location.href = "/dashboard";
+      redirect("/dashboard");
     }
   };
 

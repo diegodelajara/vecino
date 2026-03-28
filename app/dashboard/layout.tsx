@@ -9,7 +9,9 @@ import {
   DashboardSummaryCard,
   DashboardUnitCard,
   DashboardHeader,
+  Menu,
 } from "../(features)/containers";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default async function DashboardLayout({
   children,
@@ -37,26 +39,26 @@ export default async function DashboardLayout({
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-      <DashboardHeader name={profileData?.name} email={user?.email} />
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <DashboardProfileCard
-            name={profileData?.name}
-            role={profileData?.role}
-            email={user?.email}
-          />
-          <DashboardUnitCard unit={unitData ?? null} />
-          <DashboardSummaryCard expenses={expensesData ?? null} />
+    <SidebarProvider>
+      <Menu />
+      <SidebarInset>
+        <DashboardHeader name={profileData?.name} email={user?.email} />
+        <div className="flex flex-1 flex-col gap-4 p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <DashboardProfileCard
+                name={profileData?.name}
+                role={profileData?.role}
+                email={user?.email}
+              />
+              <DashboardUnitCard unit={unitData ?? null} />
+              <DashboardSummaryCard expenses={expensesData ?? null} />
+            </div>
+            <DashboardExpensesTable expenses={expensesData ?? null} />
+            <div className="mt-8">{children}</div>
+          </div>
         </div>
-
-        <DashboardExpensesTable expenses={expensesData ?? null} />
-
-        {/* Page Content */}
-        <div className="mt-8">{children}</div>
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

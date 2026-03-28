@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { logout } from "../../../dashboard/actions";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 type Props = {
   name?: string | null;
@@ -13,6 +14,7 @@ export function DashboardHeader({ name, email }: Props) {
     <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <SidebarTrigger className="-ml-1" />
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">🏢</span>
           </div>

@@ -5,4 +5,5 @@ export { DashboardUnitCard } from "./dashboard/DashboardUnitCard";
 export { DashboardSummaryCard } from "./dashboard/DashboardSummaryCard";
 export { DashboardExpensesTable } from "./dashboard/DashboardExpensesTable";
 export { DashboardHeader } from "./dashboard/DashboardHeader";
+export { Menu } from "./menu";
 export { Expenses } from "./expenses";
