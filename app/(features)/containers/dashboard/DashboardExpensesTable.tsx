@@ -1,3 +1,4 @@
+"use client";
 import { Card } from "@/components/ui/card";
 
 type ExpenseRow = {
@@ -12,6 +13,10 @@ type Props = {
 };
 
 export const DashboardExpensesTable = ({ expenses }: Props) => {
+  const handlePay = () => {
+    alert("Función de pago no implementada aún.");
+  };
+
   if (!expenses || expenses.length === 0) {
     return (
       <Card className="bg-white dark:bg-slate-800 border-dashed">
@@ -28,7 +33,7 @@ export const DashboardExpensesTable = ({ expenses }: Props) => {
     <Card className="bg-white dark:bg-slate-800 overflow-hidden">
       <div className="p-6 border-b border-slate-200 dark:border-slate-700">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          Historial de Gastos
+          Historial de Gastos Comunes
         </h2>
       </div>
       <div className="overflow-x-auto">
@@ -43,6 +48,9 @@ export const DashboardExpensesTable = ({ expenses }: Props) => {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Estado
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                Pagar
               </th>
             </tr>
           </thead>
@@ -68,6 +76,14 @@ export const DashboardExpensesTable = ({ expenses }: Props) => {
                   >
                     {expense.status === "paid" ? "Pagado" : "Pendiente"}
                   </span>
+                </td>
+                <td className="px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
+                  <button
+                    onClick={handlePay}
+                    className="bg-black text-white px-4 py-2 rounded"
+                  >
+                    Pagar
+                  </button>
                 </td>
               </tr>
             ))}
