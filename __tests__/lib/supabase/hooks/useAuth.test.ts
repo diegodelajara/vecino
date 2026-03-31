@@ -19,7 +19,9 @@ const mockSignOut = vi.fn();
 describe("useAuth hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const authService = (authServiceModule as any).authService;
+    const authService = (
+      authServiceModule as typeof authServiceModule.authService
+    ).authService;
     authService.signInWithPassword = mockSignInWithPassword;
     authService.getUser = mockGetUser;
     authService.signOut = mockSignOut;

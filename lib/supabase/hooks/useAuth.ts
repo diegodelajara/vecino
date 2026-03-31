@@ -11,8 +11,10 @@ export const useAuth = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: supabaseError } =
-        await authService.signInWithPassword(email, password);
+      const { error: supabaseError } = await authService.signInWithPassword(
+        email,
+        password,
+      );
 
       if (supabaseError) {
         setError(supabaseError.message);

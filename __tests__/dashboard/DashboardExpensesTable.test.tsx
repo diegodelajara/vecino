@@ -1,8 +1,24 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DashboardExpensesTable } from "@/app/(features)/containers/dashboard/DashboardExpensesTable";
 
 describe("DashboardExpensesTable Component", () => {
+  beforeEach(() => {
+    // Mock fetch global
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ url: "https://example.com/pay" }),
+      } as Response),
+    );
+
+    // Mock window.location.href
+    Object.defineProperty(window, "location", {
+      value: {
+        href: "",
+      },
+      writable: true,
+    });
+  });
   it("renders empty state when expenses is null", () => {
     render(<DashboardExpensesTable expenses={null} />);
     expect(
@@ -132,8 +148,7 @@ describe("DashboardExpensesTable Component", () => {
     expect(screen.getByRole("button", { name: /pagar/i })).toBeInTheDocument();
   });
 
-  it("calls handlePay when pay button is clicked", () => {
-    const alertSpy = vi.spyOn(global, "alert").mockImplementation(() => {});
+  it("calls handlePay when pay button is clicked", async () => {
     render(
       <DashboardExpensesTable
         expenses={[
@@ -148,10 +163,12 @@ describe("DashboardExpensesTable Component", () => {
     );
     const payButton = screen.getByRole("button", { name: /pagar/i });
     fireEvent.click(payButton);
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Función de pago no implementada aún.",
-    );
-    alertSpy.mockRestore();
+
+    // Wait for async fetch to complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(global.fetch).toHaveBeenCalledWith("/api/pay", { method: "POST" });
+    expect(window.location.href).toBe("https://example.com/pay");
   });
 
   it("displays multiple expenses in rows", () => {
@@ -196,8 +213,7 @@ describe("DashboardExpensesTable Component", () => {
     expect(paidBadge || screen.getByText("Pagado")).toBeInTheDocument();
   });
 
-  it("handles multiple pay button clicks", () => {
-    const alertSpy = vi.spyOn(global, "alert").mockImplementation(() => {});
+  it("handles multiple pay button clicks", async () => {
     render(
       <DashboardExpensesTable
         expenses={[
@@ -219,7 +235,11 @@ describe("DashboardExpensesTable Component", () => {
     const payButtons = screen.getAllByRole("button", { name: /pagar/i });
     fireEvent.click(payButtons[0]);
     fireEvent.click(payButtons[1]);
-    expect(alertSpy).toHaveBeenCalledTimes(2);
-    alertSpy.mockRestore();
+
+    // Wait for async fetches to complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenCalledWith("/api/pay", { method: "POST" });
   });
 });

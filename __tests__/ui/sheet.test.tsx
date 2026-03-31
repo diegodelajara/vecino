@@ -413,7 +413,7 @@ describe("Sheet Components", () => {
   });
 
   it("Sheet and content variants render correctly", async () => {
-    const { Sheet, SheetContent } = await import("@/components/ui/sheet");
+    const { SheetContent } = await import("@/components/ui/sheet");
 
     const rightSheet = SheetContent({
       children: "Right side",

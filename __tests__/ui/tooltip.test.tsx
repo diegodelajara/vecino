@@ -5,32 +5,47 @@ import React from "react";
 // Mock radix-ui
 vi.mock("radix-ui", () => ({
   Tooltip: {
-    Provider: ({ children, ...props }: any) => (
+    Provider: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div data-testid="tooltip-provider" {...props}>
         {children}
       </div>
     ),
-    Root: ({ children, ...props }: any) => (
+    Root: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div data-testid="tooltip" {...props}>
         {children}
       </div>
     ),
-    Trigger: ({ children, ...props }: any) => (
+    Trigger: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
       <button data-testid="tooltip-trigger" {...props}>
         {children}
       </button>
     ),
-    Content: ({ children, ...props }: any) => (
+    Content: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div data-testid="tooltip-content" {...props}>
         {children}
       </div>
     ),
-    Portal: ({ children, ...props }: any) => (
+    Portal: ({
+      children,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div data-testid="tooltip-portal" {...props}>
         {children}
       </div>
     ),
-    Arrow: ({ ...props }: any) => (
+    Arrow: ({ ...props }: Record<string, unknown>) => (
       <div data-testid="tooltip-arrow" {...props} />
     ),
   },

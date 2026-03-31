@@ -7,17 +7,20 @@ vi.mock("@/lib/supabase/supabaseClient", () => ({
 
 describe("Supabase hooks barrel export", () => {
   it("exports useAuth hook", async () => {
+    // eslint-disable-next-line @next/next/no-assign-module-variable
     const module = await import("@/lib/supabase/hooks");
     expect(typeof module.useAuth).toBe("function");
   });
 
   it("useAuth is a valid hook function", async () => {
+    // eslint-disable-next-line @next/next/no-assign-module-variable
     const module = await import("@/lib/supabase/hooks");
     const hookName = module.useAuth.name;
     expect(hookName).toBe("useAuth");
   });
 
   it("useAuth hook can be imported directly", async () => {
+    // eslint-disable-next-line @next/next/no-assign-module-variable
     const module = await import("@/lib/supabase/hooks");
     expect(module.useAuth).toBeDefined();
   });

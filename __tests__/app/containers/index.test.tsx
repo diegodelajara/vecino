@@ -21,6 +21,7 @@ vi.mock("@/lib/supabase/services/auth.service", () => ({
 
 describe("Containers barrel export", () => {
   it("exports all container components and hooks", async () => {
+    // eslint-disable-next-line @next/next/no-assign-module-variable
     const module = await import("@/app/(features)/containers");
 
     expect(typeof module.Login).toBe("function");
@@ -35,6 +36,7 @@ describe("Containers barrel export", () => {
   });
 
   it("all exports are distinct functions", async () => {
+    // eslint-disable-next-line @next/next/no-assign-module-variable
     const module = await import("@/app/(features)/containers");
     const exports = [
       module.Login,

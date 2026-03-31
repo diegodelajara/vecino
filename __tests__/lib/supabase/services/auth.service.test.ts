@@ -20,7 +20,8 @@ const mockSignOut = vi.fn();
 describe("authService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const supabase = (supabaseModule as any).supabase;
+    const supabase = (supabaseModule as typeof supabaseModule.supabase)
+      .supabase;
     supabase.auth.signInWithPassword = mockSignInWithPassword;
     supabase.auth.getUser = mockGetUser;
     supabase.auth.signOut = mockSignOut;

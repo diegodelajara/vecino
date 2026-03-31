@@ -5,7 +5,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 interface MockMediaQueryList extends MediaQueryList {
   matches: boolean;
   media: string;
-  onchange: ((this: MediaQueryList, ev: MediaQueryListEvent) => any) | null;
+  onchange: ((this: MediaQueryList, ev: MediaQueryListEvent) => void) | null;
   addListener: (listener: MediaQueryListListener) => void;
   removeListener: (listener: MediaQueryListListener) => void;
   addEventListener: (
