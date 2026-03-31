@@ -213,9 +213,7 @@ describe("Sheet Components", () => {
   it("SheetFooter multiple custom classes merge correctly", async () => {
     const { SheetFooter } = await import("@/components/ui/sheet");
     const { container } = render(
-      <SheetFooter className="bg-blue-500 border-t">
-        Content
-      </SheetFooter>,
+      <SheetFooter className="bg-blue-500 border-t">Content</SheetFooter>,
     );
     const element = container.querySelector('[data-slot="sheet-footer"]');
     expect(element?.className).toContain("bg-blue-500");
@@ -240,13 +238,15 @@ describe("Sheet Components", () => {
   });
 
   it("all components handle empty children", async () => {
-    const { SheetHeader, SheetFooter } = await import(
-      "@/components/ui/sheet"
-    );
+    const { SheetHeader, SheetFooter } = await import("@/components/ui/sheet");
     const headerResult = render(<SheetHeader></SheetHeader>);
     const footerResult = render(<SheetFooter></SheetFooter>);
-    expect(headerResult.container.querySelector('[data-slot="sheet-header"]')).toBeInTheDocument();
-    expect(footerResult.container.querySelector('[data-slot="sheet-footer"]')).toBeInTheDocument();
+    expect(
+      headerResult.container.querySelector('[data-slot="sheet-header"]'),
+    ).toBeInTheDocument();
+    expect(
+      footerResult.container.querySelector('[data-slot="sheet-footer"]'),
+    ).toBeInTheDocument();
   });
 
   it("SheetTrigger is callable and returns JSX", async () => {
@@ -280,9 +280,9 @@ describe("Sheet Components", () => {
 
   it("SheetContent accepts side prop", async () => {
     const { SheetContent } = await import("@/components/ui/sheet");
-    const component = SheetContent({ 
+    const component = SheetContent({
       children: "Content",
-      side: "left"
+      side: "left",
     });
     expect(component).toBeDefined();
   });
@@ -290,10 +290,10 @@ describe("Sheet Components", () => {
   it("SheetContent accepts different side values", async () => {
     const { SheetContent } = await import("@/components/ui/sheet");
     const sides = ["top", "right", "bottom", "left"];
-    sides.forEach(side => {
-      const component = SheetContent({ 
+    sides.forEach((side) => {
+      const component = SheetContent({
         children: "Content",
-        side: side as "top" | "right" | "bottom" | "left"
+        side: side as "top" | "right" | "bottom" | "left",
       });
       expect(component).toBeDefined();
     });
@@ -301,61 +301,61 @@ describe("Sheet Components", () => {
 
   it("SheetContent has showCloseButton prop", async () => {
     const { SheetContent } = await import("@/components/ui/sheet");
-    const componentWithClose = SheetContent({ 
+    const componentWithClose = SheetContent({
       children: "Content",
-      showCloseButton: true
+      showCloseButton: true,
     });
     expect(componentWithClose).toBeDefined();
-    
-    const componentWithoutClose = SheetContent({ 
+
+    const componentWithoutClose = SheetContent({
       children: "Content",
-      showCloseButton: false
+      showCloseButton: false,
     });
     expect(componentWithoutClose).toBeDefined();
   });
 
   it("SheetContent applies className prop", async () => {
     const { SheetContent } = await import("@/components/ui/sheet");
-    const component = SheetContent({ 
+    const component = SheetContent({
       children: "Content",
-      className: "custom-content"
+      className: "custom-content",
     });
     expect(component).toBeDefined();
   });
 
   it("SheetTitle forwards className prop", async () => {
     const { SheetTitle } = await import("@/components/ui/sheet");
-    const component = SheetTitle({ 
+    const component = SheetTitle({
       children: "Title",
-      className: "custom-title" 
+      className: "custom-title",
     });
     expect(component).toBeDefined();
   });
 
   it("SheetDescription forwards className prop", async () => {
     const { SheetDescription } = await import("@/components/ui/sheet");
-    const component = SheetDescription({ 
+    const component = SheetDescription({
       children: "Description",
-      className: "custom-desc" 
+      className: "custom-desc",
     });
     expect(component).toBeDefined();
   });
 
   it("SheetTrigger forwards custom props", async () => {
     const { SheetTrigger } = await import("@/components/ui/sheet");
-    const component = SheetTrigger({ 
+    const component = SheetTrigger({
       children: "Open",
       id: "trigger-1",
-      className: "custom-trigger"
+      className: "custom-trigger",
     });
     expect(component).toBeDefined();
   });
 
   it("SheetClose forwards custom props", async () => {
     const { SheetClose } = await import("@/components/ui/sheet");
-    const component = SheetClose({ 
+    const component = SheetClose({
       id: "close-1",
-      className: "custom-close"
+      className: "custom-close",
     });
     expect(component).toBeDefined();
   });
@@ -363,21 +363,20 @@ describe("Sheet Components", () => {
   it("Sheet is callable with optional props", async () => {
     const { Sheet } = await import("@/components/ui/sheet");
     expect(typeof Sheet).toBe("function");
-    const component = Sheet({ 
+    const component = Sheet({
       children: "Content",
-      open: true
+      open: true,
     });
     expect(component).toBeDefined();
   });
 
   it("Sheet children can be nested components", async () => {
-    const { Sheet, SheetContent, SheetHeader } = await import(
-      "@/components/ui/sheet"
-    );
-    const component = Sheet({ 
+    const { Sheet, SheetContent, SheetHeader } =
+      await import("@/components/ui/sheet");
+    const component = Sheet({
       children: [
-        SheetContent({ children: SheetHeader({ children: "Header" }) })
-      ]
+        SheetContent({ children: SheetHeader({ children: "Header" }) }),
+      ],
     });
     expect(component).toBeDefined();
   });
@@ -386,57 +385,57 @@ describe("Sheet Components", () => {
     const { SheetContent } = await import("@/components/ui/sheet");
     const stringChild = SheetContent({ children: "Text content" });
     expect(stringChild).toBeDefined();
-    
-    const multpleChildren = SheetContent({ 
-      children: ["Header", "Body", "Footer"]
+
+    const multpleChildren = SheetContent({
+      children: ["Header", "Body", "Footer"],
     });
     expect(multpleChildren).toBeDefined();
   });
 
   it("SheetTitle with custom styling", async () => {
     const { SheetTitle } = await import("@/components/ui/sheet");
-    const component = SheetTitle({ 
+    const component = SheetTitle({
       children: "Custom Title",
       className: "text-lg font-bold",
-      id: "custom-title"
+      id: "custom-title",
     });
     expect(component).toBeDefined();
   });
 
   it("SheetDescription with custom styling", async () => {
     const { SheetDescription } = await import("@/components/ui/sheet");
-    const component = SheetDescription({ 
+    const component = SheetDescription({
       children: "Custom description",
       className: "text-gray-600",
-      id: "custom-desc"
+      id: "custom-desc",
     });
     expect(component).toBeDefined();
   });
 
   it("Sheet and content variants render correctly", async () => {
     const { Sheet, SheetContent } = await import("@/components/ui/sheet");
-    
-    const rightSheet = SheetContent({ 
+
+    const rightSheet = SheetContent({
       children: "Right side",
-      side: "right"
+      side: "right",
     });
     expect(rightSheet).toBeDefined();
-    
-    const leftSheet = SheetContent({ 
+
+    const leftSheet = SheetContent({
       children: "Left side",
-      side: "left"
+      side: "left",
     });
     expect(leftSheet).toBeDefined();
-    
-    const topSheet = SheetContent({ 
+
+    const topSheet = SheetContent({
       children: "Top side",
-      side: "top"
+      side: "top",
     });
     expect(topSheet).toBeDefined();
-    
-    const bottomSheet = SheetContent({ 
+
+    const bottomSheet = SheetContent({
       children: "Bottom side",
-      side: "bottom"
+      side: "bottom",
     });
     expect(bottomSheet).toBeDefined();
   });

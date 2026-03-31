@@ -155,9 +155,8 @@ describe("Sidebar Components", () => {
   });
 
   it("Sidebar component renders with correct data-slot", async () => {
-    const { SidebarProvider, Sidebar } = await import(
-      "@/components/ui/sidebar"
-    );
+    const { SidebarProvider, Sidebar } =
+      await import("@/components/ui/sidebar");
     const { container } = render(
       <SidebarProvider>
         <Sidebar>
@@ -296,7 +295,9 @@ describe("Sidebar Components", () => {
 
   it("SidebarMenu accepts id prop", async () => {
     const { SidebarMenu } = await import("@/components/ui/sidebar");
-    const { container } = render(<SidebarMenu id="test-menu">Menu</SidebarMenu>);
+    const { container } = render(
+      <SidebarMenu id="test-menu">Menu</SidebarMenu>,
+    );
     const menu = container.querySelector('[data-slot="sidebar-menu"]');
     expect(menu?.id).toBe("test-menu");
   });
@@ -347,7 +348,9 @@ describe("Sidebar Components", () => {
   it("SidebarMenuSubButton applies custom className", async () => {
     const { SidebarMenuSubButton } = await import("@/components/ui/sidebar");
     const { container } = render(
-      <SidebarMenuSubButton className="custom-btn">Action</SidebarMenuSubButton>,
+      <SidebarMenuSubButton className="custom-btn">
+        Action
+      </SidebarMenuSubButton>,
     );
     const button = container.querySelector(
       '[data-slot="sidebar-menu-sub-button"]',
@@ -360,9 +363,7 @@ describe("Sidebar Components", () => {
     const { container } = render(
       <SidebarMenuSubItem className="custom-sub-item">Item</SidebarMenuSubItem>,
     );
-    const item = container.querySelector(
-      '[data-slot="sidebar-menu-sub-item"]',
-    );
+    const item = container.querySelector('[data-slot="sidebar-menu-sub-item"]');
     expect(item).toHaveClass("custom-sub-item");
   });
 
