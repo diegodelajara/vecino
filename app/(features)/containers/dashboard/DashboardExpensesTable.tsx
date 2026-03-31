@@ -13,8 +13,14 @@ type Props = {
 };
 
 export const DashboardExpensesTable = ({ expenses }: Props) => {
-  const handlePay = () => {
-    alert("Función de pago no implementada aún.");
+  const handlePay = async () => {
+    const res = await fetch("/api/pay", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    window.location.href = data.url;
   };
 
   if (!expenses || expenses.length === 0) {
