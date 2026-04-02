@@ -1,6 +1,8 @@
-// src/app/api/pay/route.ts
-
 import { MercadoPagoConfig, Preference } from "mercadopago";
+
+export async function GET() {
+  return Response.json({ message: "Endpoint de pago disponible. Usa POST." });
+}
 
 export async function POST() {
   const client = new MercadoPagoConfig({
@@ -17,21 +19,19 @@ export async function POST() {
           id: "1",
           title: "Gastos comunes",
           quantity: 1,
-          unit_price: 85000,
+          unit_price: 100000,
         },
       ],
+      external_reference: "user_123_expense_456",
       back_urls: {
         success: `${baseUrl}/dashboard`,
         failure: `${baseUrl}/dashboard`,
         pending: `${baseUrl}/dashboard`,
       },
-      auto_return: "approved", // 🔥 ESTO FALTABA
-      notification_url: `${baseUrl}/api/webhooks/mercadopago`,
     },
   });
-  console.log("🔥 MP RESULT:", result);
-  console.log("👉 INIT POINT:", result.init_point);
-  console.log("👉 ID:", result.id);
+
+  console.log("MP RESULT:", result);
 
   return Response.json({
     url: result.init_point,
