@@ -39,6 +39,7 @@
     "@vitest/ui": "^4.1.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
+    "globals": "^17.4.0",
     "husky": "^9.1.7",
     "jsdom": "^27.0.1",
     "lint-staged": "^16.4.0",

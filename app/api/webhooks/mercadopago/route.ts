@@ -1,9 +1,39 @@
-export async function POST(req: Request) {
-  console.log("🔥 WEBHOOK HIT");
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
-  const body = await req.json();
-  console.log("📩 WEBHOOK:", body);
-  console.log("CREANDO PAGO CON URL:", process.env.NEXT_PUBLIC_BASE_URL);
+export async function GET() {
+  return Response.json({ message: "Endpoint de pago disponible. Usa POST." });
+}
 
-  return Response.json({ ok: true });
+export async function POST() {
+  const client = new MercadoPagoConfig({
+    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+  });
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+  const preference = new Preference(client);
+  const result = await preference.create({
+    body: {
+      items: [
+        {
+          id: "1",
+          title: "Gastos comunes",
+          quantity: 1,
+          unit_price: 100000,
+        },
+      ],
+      external_reference: "user_123_expense_456",
+      back_urls: {
+        success: `${baseUrl}/success`,
+        failure: `${baseUrl}/failure`,
+        pending: `${baseUrl}/dashboard`,
+      },
+    },
+  });
+
+  console.log("MP RESULT:", result);
+
+  return Response.json({
+    url: result.init_point,
+  });
 }

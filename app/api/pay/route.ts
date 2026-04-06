@@ -1,8 +1,13 @@
 // src/app/api/pay/route.ts
 
+import { serverAuthService } from "@/lib/supabase/services";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export async function POST() {
+  const {
+    data: { user },
+  } = await serverAuthService.getUser();
+
   const client = new MercadoPagoConfig({
     accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
   });
@@ -20,18 +25,18 @@ export async function POST() {
           unit_price: 85000,
         },
       ],
+      metadata: {
+        user_id: user?.id, // 🔥 ESTE ES CLAVE
+      },
       back_urls: {
-        success: `${baseUrl}/dashboard`,
-        failure: `${baseUrl}/dashboard`,
+        success: `${baseUrl}/success`,
+        failure: `${baseUrl}/failure`,
         pending: `${baseUrl}/dashboard`,
       },
       auto_return: "approved", // 🔥 ESTO FALTABA
       notification_url: `${baseUrl}/api/webhooks/mercadopago`,
     },
   });
-  console.log("🔥 MP RESULT:", result);
-  console.log("👉 INIT POINT:", result.init_point);
-  console.log("👉 ID:", result.id);
 
   return Response.json({
     url: result.init_point,
