@@ -2,22 +2,22 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DashboardExpensesTable } from "@/app/(features)/containers/dashboard/DashboardExpensesTable";
 
+const mockPush = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 describe("DashboardExpensesTable Component", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+
     // Mock fetch global
     global.fetch = vi.fn(() =>
       Promise.resolve({
         json: () => Promise.resolve({ url: "https://example.com/pay" }),
       } as Response),
     );
-
-    // Mock window.location.href
-    Object.defineProperty(window, "location", {
-      value: {
-        href: "",
-      },
-      writable: true,
-    });
   });
   it("renders empty state when expenses is null", () => {
     render(<DashboardExpensesTable expenses={null} />);
@@ -167,8 +167,12 @@ describe("DashboardExpensesTable Component", () => {
     // Wait for async fetch to complete
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/pay", { method: "POST" });
-    expect(window.location.href).toBe("https://example.com/pay");
+    expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expenseId: "1" }),
+    });
+    expect(mockPush).toHaveBeenCalledWith("https://example.com/pay");
   });
 
   it("displays multiple expenses in rows", () => {
@@ -240,6 +244,15 @@ describe("DashboardExpensesTable Component", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(global.fetch).toHaveBeenCalledTimes(2);
-    expect(global.fetch).toHaveBeenCalledWith("/api/pay", { method: "POST" });
+    expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expenseId: "1" }),
+    });
+    expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expenseId: "2" }),
+    });
   });
 });

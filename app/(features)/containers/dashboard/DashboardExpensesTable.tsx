@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 
 type ExpenseRow = {
@@ -13,14 +14,17 @@ type Props = {
 };
 
 export const DashboardExpensesTable = ({ expenses }: Props) => {
-  const handlePay = async () => {
+  const router = useRouter();
+
+  const handlePay = async (expenseId: string) => {
     const res = await fetch("/api/pay", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expenseId }),
     });
 
     const data = await res.json();
-
-    window.location.href = data.url;
+    router.push(data.url);
   };
 
   if (!expenses || expenses.length === 0) {
@@ -85,7 +89,7 @@ export const DashboardExpensesTable = ({ expenses }: Props) => {
                 </td>
                 <td className="px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
                   <button
-                    onClick={handlePay}
+                    onClick={() => handlePay(expense.id)}
                     className="bg-black text-white px-4 py-2 rounded"
                   >
                     Pagar

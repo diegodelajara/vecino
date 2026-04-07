@@ -3,7 +3,9 @@
 import { serverAuthService } from "@/lib/supabase/services";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
-export async function POST() {
+export async function POST(req: Request) {
+  const { expenseId } = await req.json();
+
   const {
     data: { user },
   } = await serverAuthService.getUser();
@@ -25,15 +27,13 @@ export async function POST() {
           unit_price: 85000,
         },
       ],
-      metadata: {
-        user_id: user?.id, // 🔥 ESTE ES CLAVE
-      },
+      external_reference: `${user?.id}|${expenseId}`,
       back_urls: {
         success: `${baseUrl}/success`,
         failure: `${baseUrl}/failure`,
         pending: `${baseUrl}/dashboard`,
       },
-      auto_return: "approved", // 🔥 ESTO FALTABA
+      auto_return: "approved",
       notification_url: `${baseUrl}/api/webhooks/mercadopago`,
     },
   });

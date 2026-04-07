@@ -21,14 +21,33 @@ export async function POST(req: Request) {
     );
   }
 
-  await savePayment({
-    mp_payment_id: String(paymentData.id),
-    amount: paymentData.transaction_amount!,
-    status: paymentData.status,
-    user_id: paymentData.external_reference!,
-  });
+  // Extraer user_id y expense_id del external_reference
+  const [userId, expenseId] = (paymentData.external_reference ?? "").split("|");
 
-  console.log("paymentData", paymentData);
+  // Extraer payment_method y payer_email de MercadoPago
+  const paymentMethod =
+    paymentData.payment_method?.type ||
+    paymentData.payment_method_id ||
+    "unknown";
+  const payerEmail = paymentData.payer?.email || null;
+
+  try {
+    await savePayment({
+      mp_payment_id: String(paymentData.id),
+      amount: paymentData.transaction_amount!,
+      status: paymentData.status,
+      user_id: userId,
+      expense_id: expenseId ?? null,
+      payment_method: paymentMethod,
+      payer_email: payerEmail,
+    });
+  } catch (err) {
+    console.error("❌ ERROR al guardar pago:", err);
+    return Response.json(
+      { ok: false, error: "Error al guardar el pago en la base de datos" },
+      { status: 500 },
+    );
+  }
 
   return Response.json({ ok: true, payment: paymentData }, { status: 200 });
 }
