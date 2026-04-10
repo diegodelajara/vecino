@@ -1,39 +1,50 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
+import { savePayment } from "@/lib/supabase/services";
+import { MercadoPagoConfig, Payment } from "mercadopago";
 
 export async function GET() {
-  return Response.json({ message: "Endpoint de pago disponible. Usa POST." });
+  return Response.json({ message: "Webhook de MercadoPago activo." });
 }
 
-export async function POST() {
+export async function POST(req: Request) {
+  const body = await req.json();
+
+  // MercadoPago envía { type: "payment", data: { id: "..." } }
+  if (body.type !== "payment" || !body.data?.id) {
+    return Response.json({ ok: true }, { status: 200 });
+  }
+
   const client = new MercadoPagoConfig({
     accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const payment = new Payment(client);
+  const paymentData = await payment.get({ id: body.data.id });
 
-  const preference = new Preference(client);
-  const result = await preference.create({
-    body: {
-      items: [
-        {
-          id: "1",
-          title: "Gastos comunes",
-          quantity: 1,
-          unit_price: 100000,
-        },
-      ],
-      external_reference: "user_123_expense_456",
-      back_urls: {
-        success: `${baseUrl}/success`,
-        failure: `${baseUrl}/failure`,
-        pending: `${baseUrl}/dashboard`,
-      },
-    },
-  });
+  if (paymentData.status !== "approved") {
+    return Response.json({ ok: true }, { status: 200 });
+  }
 
-  console.log("MP RESULT:", result);
+  const [userId, expenseId] = (paymentData.external_reference ?? "").split("|");
+  const paymentMethod =
+    paymentData.payment_method?.type ||
+    paymentData.payment_method_id ||
+    "unknown";
+  const payerEmail = paymentData.payer?.email || null;
 
-  return Response.json({
-    url: result.init_point,
-  });
+  try {
+    await savePayment({
+      mp_payment_id: String(paymentData.id),
+      amount: paymentData.transaction_amount!,
+      status: paymentData.status,
+      user_id: userId,
+      expense_id: expenseId ?? null,
+      payment_method: paymentMethod,
+      payer_email: payerEmail,
+    });
+  } catch (err) {
+    console.error("❌ Webhook: error al guardar pago:", err);
+    return Response.json({ ok: false }, { status: 500 });
+  }
+
+  return Response.json({ ok: true }, { status: 200 });
 }

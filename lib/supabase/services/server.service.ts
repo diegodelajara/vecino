@@ -61,4 +61,18 @@ export const serverProfilesService = {
       .select(`*, expenses (month, year)`)
       .eq("unit_id", id);
   },
+
+  async getUnitExpenseStatus(
+    expenseId: string,
+    unitId: string,
+  ): Promise<{ status: string | null }> {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("unit_expenses")
+      .select("status")
+      .eq("expense_id", expenseId)
+      .eq("unit_id", unitId)
+      .single();
+    return { status: data?.status ?? null };
+  },
 };

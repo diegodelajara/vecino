@@ -1,31 +1,18 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
   const status = searchParams.get("status");
-
-  const [phase, setPhase] = useState<"loading" | "ok" | "err">(() => {
-    if (!paymentId) return "err";
-    if (status && status !== "approved") return "err";
-    return "loading";
-  });
-
-  const [detail, setDetail] = useState<string | null>(() => {
-    if (!paymentId) {
-      return "No encontramos el identificador del pago en la URL.";
-    }
-    if (status && status !== "approved") {
-      return "El pago no fue aprobado.";
-    }
-    return null;
-  });
+  const router = useRouter();
 
   useEffect(() => {
     if (!paymentId || (status && status !== "approved")) {
+      router.replace("/dashboard");
       return;
     }
 
@@ -33,26 +20,13 @@ function SuccessContent() {
 
     const run = async () => {
       try {
-        const res = await fetch("/api/confirm-payment", {
+        await fetch("/api/confirm-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId }),
         });
-        const data = (await res.json().catch(() => ({}))) as {
-          error?: string;
-        };
-        if (cancelled) return;
-        if (!res.ok) {
-          setPhase("err");
-          setDetail(data.error ?? "No pudimos confirmar el pago.");
-          return;
-        }
-        setPhase("ok");
-      } catch {
-        if (!cancelled) {
-          setPhase("err");
-          setDetail("Error de red al confirmar el pago.");
-        }
+      } finally {
+        if (!cancelled) router.replace("/dashboard");
       }
     };
 
@@ -60,22 +34,27 @@ function SuccessContent() {
     return () => {
       cancelled = true;
     };
-  }, [paymentId, status]);
+  }, [paymentId, status, router]);
 
-  if (phase === "loading") {
-    return <div>Confirmando pago…</div>;
-  }
-
-  if (phase === "err") {
-    return <div>{detail}</div>;
-  }
-
-  return <div>Pago confirmado</div>;
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      <Loader2 className="h-10 w-10 animate-spin text-slate-600 dark:text-slate-300" />
+      <p className="text-slate-600 dark:text-slate-300 text-sm">
+        Confirmando tu pago…
+      </p>
+    </div>
+  );
 }
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<div>Cargando…</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-slate-600" />
+        </div>
+      }
+    >
       <SuccessContent />
     </Suspense>
   );

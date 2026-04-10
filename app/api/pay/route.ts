@@ -1,14 +1,28 @@
 // src/app/api/pay/route.ts
 
-import { serverAuthService } from "@/lib/supabase/services";
+import { serverAuthService, serverProfilesService } from "@/lib/supabase/services";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export async function POST(req: Request) {
-  const { expenseId } = await req.json();
+  const { expenseId, amount } = await req.json();
 
   const {
     data: { user },
   } = await serverAuthService.getUser();
+
+  // Verificar si el gasto ya está pagado
+  const { data: profile } = await serverProfilesService.getProfileById(user!.id);
+
+  if (profile?.unit_id) {
+    const { status } = await serverProfilesService.getUnitExpenseStatus(expenseId, profile.unit_id);
+
+    if (status === "paid") {
+      return Response.json(
+        { error: "Este gasto ya fue pagado" },
+        { status: 400 },
+      );
+    }
+  }
 
   const client = new MercadoPagoConfig({
     accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
@@ -21,10 +35,10 @@ export async function POST(req: Request) {
     body: {
       items: [
         {
-          id: "1",
+          id: expenseId,
           title: "Gastos comunes",
           quantity: 1,
-          unit_price: 85000,
+          unit_price: amount,
         },
       ],
       external_reference: `${user?.id}|${expenseId}`,

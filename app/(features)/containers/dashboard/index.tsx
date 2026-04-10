@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import {
   serverAuthService,
   serverProfilesService,
+  getApprovedExpenseIds,
 } from "@/lib/supabase/services";
 import { DashboardUnitCard } from "./DashboardUnitCard";
 import { DashboardSummaryCard } from "./DashboardSummaryCard";
@@ -33,6 +34,9 @@ export const DashboardContainer = async () => {
     profileData?.unit_id,
   );
 
+  const expenseIds = (expensesData ?? []).map((e) => e.id);
+  const paidExpenseIds = await getApprovedExpenseIds(expenseIds);
+
   return (
     <SidebarProvider>
       <Menu />
@@ -49,7 +53,10 @@ export const DashboardContainer = async () => {
               <DashboardUnitCard unit={unitData ?? null} />
               <DashboardSummaryCard expenses={expensesData ?? null} />
             </div>
-            <DashboardExpensesTable expenses={expensesData ?? null} />
+            <DashboardExpensesTable
+              expenses={expensesData ?? null}
+              paidExpenseIds={paidExpenseIds}
+            />
           </div>
         </div>
       </SidebarInset>

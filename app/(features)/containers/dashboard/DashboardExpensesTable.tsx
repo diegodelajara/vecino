@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 
@@ -11,20 +12,35 @@ type ExpenseRow = {
 
 type Props = {
   expenses: ExpenseRow[] | null;
+  paidExpenseIds?: string[];
 };
 
-export const DashboardExpensesTable = ({ expenses }: Props) => {
+export const DashboardExpensesTable = ({
+  expenses,
+  paidExpenseIds = [],
+}: Props) => {
   const router = useRouter();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const handlePay = async (expenseId: string) => {
-    const res = await fetch("/api/pay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expenseId }),
-    });
+  const handlePay = async (expenseId: string, amount: number) => {
+    setLoadingId(expenseId);
+    try {
+      const res = await fetch("/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expenseId, amount }),
+      });
 
-    const data = await res.json();
-    router.push(data.url);
+      if (!res.ok) {
+        router.refresh();
+        return;
+      }
+
+      const data = await res.json();
+      router.push(data.url);
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   if (!expenses || expenses.length === 0) {
@@ -88,12 +104,19 @@ export const DashboardExpensesTable = ({ expenses }: Props) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm font-semibold text-slate-900 dark:text-white">
-                  <button
-                    onClick={() => handlePay(expense.id)}
-                    className="bg-black text-white px-4 py-2 rounded"
-                  >
-                    Pagar
-                  </button>
+                  {paidExpenseIds.includes(expense.id) ? (
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      Pagado
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handlePay(expense.id, expense.amount)}
+                      disabled={loadingId === expense.id}
+                      className="bg-black text-white px-4 py-2 rounded flex items-center gap-2 disabled:opacity-60"
+                    >
+                      Pagar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { DashboardExpensesTable } from "@/app/(features)/containers/dashboard/DashboardExpensesTable";
 
 const mockPush = vi.fn();
+const mockRefresh = vi.fn();
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, refresh: mockRefresh }),
 }));
 
 describe("DashboardExpensesTable Component", () => {
@@ -15,6 +16,7 @@ describe("DashboardExpensesTable Component", () => {
     // Mock fetch global
     global.fetch = vi.fn(() =>
       Promise.resolve({
+        ok: true,
         json: () => Promise.resolve({ url: "https://example.com/pay" }),
       } as Response),
     );
@@ -36,6 +38,7 @@ describe("DashboardExpensesTable Component", () => {
   it("renders table title when expenses exist", () => {
     render(
       <DashboardExpensesTable
+        paidExpenseIds={["1"]}
         expenses={[
           {
             id: "1",
@@ -113,7 +116,7 @@ describe("DashboardExpensesTable Component", () => {
         ]}
       />,
     );
-    expect(screen.getByText("Pagado")).toBeInTheDocument();
+    expect(screen.getAllByText("Pagado").length).toBeGreaterThan(0);
   });
 
   it("displays 'Pendiente' status for unpaid expenses", () => {
@@ -132,9 +135,26 @@ describe("DashboardExpensesTable Component", () => {
     expect(screen.getByText("Pendiente")).toBeInTheDocument();
   });
 
-  it("renders pay button for each expense", () => {
+  it("renders pay button for pending expense", () => {
     render(
       <DashboardExpensesTable
+        expenses={[
+          {
+            id: "1",
+            amount: 100,
+            status: "pending",
+            expenses: { month: 1, year: 2026 },
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /pagar/i })).toBeInTheDocument();
+  });
+
+  it("renders paid text instead of button for paid expense", () => {
+    render(
+      <DashboardExpensesTable
+        paidExpenseIds={["1"]}
         expenses={[
           {
             id: "1",
@@ -145,7 +165,10 @@ describe("DashboardExpensesTable Component", () => {
         ]}
       />,
     );
-    expect(screen.getByRole("button", { name: /pagar/i })).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /pagar/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByText("Pagado").length).toBeGreaterThan(0);
   });
 
   it("calls handlePay when pay button is clicked", async () => {
@@ -164,15 +187,47 @@ describe("DashboardExpensesTable Component", () => {
     const payButton = screen.getByRole("button", { name: /pagar/i });
     fireEvent.click(payButton);
 
-    // Wait for async fetch to complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expenseId: "1" }),
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expenseId: "1", amount: 100 }),
+      });
     });
-    expect(mockPush).toHaveBeenCalledWith("https://example.com/pay");
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("https://example.com/pay");
+    });
+  });
+
+  it("refreshes the router when pay request fails", async () => {
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve({ error: "Este gasto ya fue pagado" }),
+      } as Response),
+    );
+
+    render(
+      <DashboardExpensesTable
+        expenses={[
+          {
+            id: "1",
+            amount: 100,
+            status: "pending",
+            expenses: { month: 1, year: 2026 },
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /pagar/i }));
+
+    await waitFor(() => {
+      expect(mockRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it("displays multiple expenses in rows", () => {
@@ -240,19 +295,19 @@ describe("DashboardExpensesTable Component", () => {
     fireEvent.click(payButtons[0]);
     fireEvent.click(payButtons[1]);
 
-    // Wait for async fetches to complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
 
-    expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expenseId: "1" }),
+      body: JSON.stringify({ expenseId: "1", amount: 100 }),
     });
     expect(global.fetch).toHaveBeenCalledWith("/api/pay", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expenseId: "2" }),
+      body: JSON.stringify({ expenseId: "2", amount: 200 }),
     });
   });
 });
