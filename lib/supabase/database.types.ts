@@ -1,134 +1,364 @@
-// Database types for Supabase tables
-export interface Database {
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.4"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          name?: string;
-          role?: string;
-          unit_id?: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          name?: string;
-          role?: string;
-          unit_id?: string;
-        };
-        Update: {
-          name?: string;
-          role?: string;
-          unit_id?: string;
-        };
-      };
-      units: {
-        Row: {
-          id: string;
-          number: string;
-          tower: string;
-          condominium_id: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          number: string;
-          tower: string;
-          condominium_id: string;
-        };
-        Update: {
-          number?: string;
-          tower?: string;
-          condominium_id?: string;
-        };
-      };
       condominiums: {
         Row: {
-          id: string;
-          name: string;
-          created_at: string;
-          updated_at: string;
-        };
+          address: string | null
+          created_at: string | null
+          id: string
+          name: string | null
+        }
         Insert: {
-          name: string;
-        };
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+        }
         Update: {
-          name?: string;
-        };
-      };
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
-          id: string;
-          month: number;
-          year: number;
-          description?: string;
-          created_at: string;
-          updated_at: string;
-        };
+          condominium_id: string | null
+          created_at: string | null
+          id: string
+          month: number | null
+          year: number | null
+        }
         Insert: {
-          month: number;
-          year: number;
-          description?: string;
-        };
+          condominium_id?: string | null
+          created_at?: string | null
+          id?: string
+          month?: number | null
+          year?: number | null
+        }
         Update: {
-          month?: number;
-          year?: number;
-          description?: string;
-        };
-      };
+          condominium_id?: string | null
+          created_at?: string | null
+          id?: string
+          month?: number | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_condominium_id_fkey"
+            columns: ["condominium_id"]
+            isOneToOne: false
+            referencedRelation: "condominiums"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          expense_id: string | null
+          id: string
+          mp_payment_id: string | null
+          payer_email: string | null
+          payment_method: string | null
+          status: string | null
+          status_detail: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          expense_id?: string | null
+          id?: string
+          mp_payment_id?: string | null
+          payer_email?: string | null
+          payment_method?: string | null
+          status?: string | null
+          status_detail?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          expense_id?: string | null
+          id?: string
+          mp_payment_id?: string | null
+          payer_email?: string | null
+          payment_method?: string | null
+          status?: string | null
+          status_detail?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          condominium_id: string | null
+          created_at: string | null
+          id: string
+          name: string | null
+          role: string | null
+          unit_id: string | null
+        }
+        Insert: {
+          condominium_id?: string | null
+          created_at?: string | null
+          id: string
+          name?: string | null
+          role?: string | null
+          unit_id?: string | null
+        }
+        Update: {
+          condominium_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          role?: string | null
+          unit_id?: string | null
+        }
+        Relationships: []
+      }
       unit_expenses: {
         Row: {
-          id: string;
-          unit_id: string;
-          expense_id: string;
-          amount: number;
-          status: string;
-          created_at: string;
-          updated_at: string;
-        };
+          amount: number | null
+          creates_at: string | null
+          expense_id: string | null
+          id: string
+          status: string | null
+          unit_id: string | null
+        }
         Insert: {
-          unit_id: string;
-          expense_id: string;
-          amount: number;
-          status: string;
-        };
+          amount?: number | null
+          creates_at?: string | null
+          expense_id?: string | null
+          id?: string
+          status?: string | null
+          unit_id?: string | null
+        }
         Update: {
-          amount?: number;
-          status?: string;
-        };
-      };
-    };
+          amount?: number | null
+          creates_at?: string | null
+          expense_id?: string | null
+          id?: string
+          status?: string | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_expenses_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_expenses_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          condominium_id: string | null
+          id: string
+          number: string | null
+          tower: string | null
+        }
+        Insert: {
+          condominium_id?: string | null
+          id?: string
+          number?: string | null
+          tower?: string | null
+        }
+        Update: {
+          condominium_id?: string | null
+          id?: string
+          number?: string | null
+          tower?: string | null
+        }
+        Relationships: []
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Enums: {
-      [_ in never]: never;
-    };
-  };
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }
 
-// Type helpers
-export type Tables<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
-export type Enums<T extends keyof Database["public"]["Enums"]> =
-  Database["public"]["Enums"][T];
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-// Specific types for your app
-export type Profile = Tables<"profiles">;
-export type Unit = Tables<"units">;
-export type Condominium = Tables<"condominiums">;
-export type Expense = Tables<"expenses">;
-export type UnitExpense = Tables<"unit_expenses">;
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-// Extended types for joins
-export interface UnitWithCondominium extends Unit {
-  condominiums?: Condominium;
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
 }
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
-export interface UnitExpenseWithExpense extends UnitExpense {
-  expenses?: Pick<Expense, "month" | "year">;
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
 }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const
