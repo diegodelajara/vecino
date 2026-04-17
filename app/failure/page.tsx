@@ -98,6 +98,26 @@ export function FailureContent() {
     };
   }, [initialStatus, initialStatusDetail, paymentId]);
 
+  useEffect(() => {
+    if (!paymentId || status === "approved") {
+      return;
+    }
+
+    const saveFailedPayment = async () => {
+      try {
+        await fetch("/api/confirm-failure-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId }),
+        });
+      } catch {
+        // Si falla, mantenemos la UX de pantalla de fallo y evitamos romper la navegación.
+      }
+    };
+
+    void saveFailedPayment();
+  }, [paymentId, status]);
+
   const description = getFailureDescription(status, statusDetail);
 
   return (

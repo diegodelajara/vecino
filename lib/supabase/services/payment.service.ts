@@ -4,6 +4,7 @@ export type SavePaymentInput = {
   mp_payment_id: string;
   amount: number;
   status: string;
+  status_detail?: string | null;
   user_id: string;
   expense_id?: string | null;
   payment_method?: string | null;
@@ -23,6 +24,7 @@ export async function savePayment(paymentData: SavePaymentInput) {
     mp_payment_id: paymentData.mp_payment_id,
     amount: paymentData.amount,
     status: paymentData.status,
+    status_detail: paymentData.status_detail ?? null,
     user_id: paymentData.user_id,
     payment_method: paymentData.payment_method ?? null,
     payer_email: paymentData.payer_email ?? null,
@@ -40,8 +42,8 @@ export async function savePayment(paymentData: SavePaymentInput) {
     throw new Error(`Error al guardar el pago: ${error.message}`);
   }
 
-  // Marcar el gasto como pagado en unit_expenses
-  if (paymentData.expense_id) {
+  // Marcar el gasto como pagado en unit_expenses solo si fue aprobado
+  if (paymentData.expense_id && paymentData.status === "approved") {
     // Obtener unit_id del perfil del usuario
     const { data: profile } = await supabase
       .from("profiles")
