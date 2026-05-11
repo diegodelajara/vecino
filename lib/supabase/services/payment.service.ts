@@ -20,6 +20,14 @@ export async function savePayment(paymentData: SavePaymentInput) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
+  const { data: existing } = await supabase
+    .from("payments")
+    .select("id")
+    .eq("mp_payment_id", paymentData.mp_payment_id)
+    .single();
+
+  if (existing) return;
+
   const insertData: Record<string, unknown> = {
     mp_payment_id: paymentData.mp_payment_id,
     amount: paymentData.amount,
@@ -37,14 +45,17 @@ export async function savePayment(paymentData: SavePaymentInput) {
     onConflict: "mp_payment_id",
     ignoreDuplicates: true,
   });
+  console.log(
+    "💰 PAYMENT SAVED:",
+    paymentData.mp_payment_id,
+    `(${paymentData.status})`,
+  );
 
   if (error) {
     throw new Error(`Error al guardar el pago: ${error.message}`);
   }
 
-  // Marcar el gasto como pagado en unit_expenses solo si fue aprobado
   if (paymentData.expense_id && paymentData.status === "approved") {
-    // Obtener unit_id del perfil del usuario
     const { data: profile } = await supabase
       .from("profiles")
       .select("unit_id")

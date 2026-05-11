@@ -8,6 +8,7 @@
     "start": "next start",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "test:webhook": "bash ./scripts/test-webhook.sh",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "supabase:login": "npx supabase login",
     "supabase:link": "npx supabase link",
